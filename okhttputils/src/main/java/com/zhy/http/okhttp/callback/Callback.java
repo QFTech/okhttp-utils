@@ -18,7 +18,6 @@ public abstract class Callback<T>
     /**
      * UI Thread
      *
-     * @param
      */
     public void onAfter()
     {
