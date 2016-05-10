@@ -2,6 +2,7 @@ package com.zhy.http.okhttp.request;
 
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.Callback;
+import com.zhy.http.okhttp.callback.FileCallback;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,8 @@ public class RequestCall
 
     private OkHttpClient clone;
 
+    private Callback callback;
+
     public RequestCall(OkHttpRequest request)
     {
         this.okHttpRequest = request;
@@ -49,6 +52,7 @@ public class RequestCall
 
     public Call buildCall(Callback callback)
     {
+        this.callback = callback;
         request = generateRequest(callback);
 
         if (readTimeOut > 0 || writeTimeOut > 0 || connTimeOut > 0)
@@ -111,11 +115,12 @@ public class RequestCall
 
     public void cancel()
     {
-        if (call != null)
-        {
+        if (callback != null && callback instanceof FileCallback) {
+            ((FileCallback) callback).cancelDownload();
+        }
+        if (call != null) {
             call.cancel();
         }
     }
-
 
 }

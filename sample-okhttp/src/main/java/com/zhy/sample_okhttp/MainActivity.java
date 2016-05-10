@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.BitmapCallback;
-import com.zhy.http.okhttp.callback.FileCallBack;
+import com.zhy.http.okhttp.callback.FileCallback;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.File;
@@ -284,12 +284,12 @@ public class MainActivity extends AppCompatActivity
 
     public void downloadFile(View view)
     {
-        String url = "https://github.com/hongyangAndroid/okhttp-utils/blob/master/gson-2.2.1.jar?raw=true";
+        String url = "http://dldir1.qq.com/qqfile/QQforMac/QQ_V4.1.1.dmg";
         OkHttpUtils//
                 .get()//
                 .url(url)//
                 .build()//
-                .execute(new FileCallBack(Environment.getExternalStorageDirectory().getAbsolutePath(), "gson-2.2.1.jar")//
+                .execute(new FileCallback(Environment.getExternalStorageDirectory().getAbsolutePath(), "gson-2.2.1.jar")//
                 {
 
                     @Override
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     @Override
-                    public void inProgress(float progress, long total)
+                    public void inProgress(float progress)
                     {
                         mProgressBar.setProgress((int) (100 * progress));
                     }
