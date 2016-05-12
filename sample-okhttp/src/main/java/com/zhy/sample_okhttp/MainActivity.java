@@ -301,6 +301,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void inProgress(float progress)
                     {
+                        Log.e(TAG, "inProgress :" + progress);
                         mProgressBar.setProgress((int) (100 * progress));
                     }
 

@@ -35,6 +35,10 @@ public abstract class FileCallback extends Callback<File> {
     private Condition condition;
     private boolean wait = false, cancel = false;
 
+    private int BUF = 1024 * 10;
+
+    private final int REFRESH_RATE = 50;
+
     /**
      * 设置获取到文件信息时是否挂起线程
      * 调用次方法需要调用continueDownload 或 cancelDownload
@@ -79,8 +83,7 @@ public abstract class FileCallback extends Callback<File> {
         InputStream is = null;
         FileOutputStream fos = null;
         try {
-            byte[] buf = new byte[2048 * 10];
-            int len = 0;
+            byte[] buf = new byte[BUF];
             is = response.body().byteStream();
             final long total = response.body().contentLength();
 
@@ -102,8 +105,6 @@ public abstract class FileCallback extends Callback<File> {
             }
 
             // 继续下载
-            long sum = 0;
-
             File dir = new File(destFileDir);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -112,12 +113,17 @@ public abstract class FileCallback extends Callback<File> {
             File destFile = new File(dir, destFileName);
             fos = new FileOutputStream(file);
             ProgressRunnable progressRunnable = new ProgressRunnable();
+            long sum = 0;
+            int len = 0;
+            int rate = 0;
             while ((len = is.read(buf)) != -1) {
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                progressRunnable.setProgress(finalSum * 1.0f / total);
-                OkHttpUtils.getInstance().getDelivery().post(progressRunnable);
+                if (total != -1 && rate ++ % REFRESH_RATE == 0) {
+                    progressRunnable.setProgress(finalSum * 1.0f / total);
+                    OkHttpUtils.getInstance().getDelivery().post(progressRunnable);
+                }
             }
             fos.flush();
 
@@ -167,7 +173,6 @@ public abstract class FileCallback extends Callback<File> {
      * 获取文件信息，继续下载
      */
     public void continueDownload() {
-        cancel = false;
         initLock();
         lock.lock();
         try {
